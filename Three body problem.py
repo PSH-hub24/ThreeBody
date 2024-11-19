@@ -89,6 +89,6 @@ if __name__ == "__main__":
             line_yz.set_data(solution.y[3*i+1, :frame], solution.y[3*i+2, :frame])  # y-z plane
         return lines_xy + lines_xz + lines_yz
 
-    ani = FuncAnimation(fig, update, frames=len(solution.t), init_func=init, blit=True)
+    ani = FuncAnimation(fig, update, frames=len(solution.t), init_func=init, blit=True, interval = 10)
     plt.tight_layout()
     plt.show()
