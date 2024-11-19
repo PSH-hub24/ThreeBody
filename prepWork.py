@@ -1,36 +1,39 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.optimize as optimize
-from golden_step import golden_step
+from scipy.fft import rfft
+from golden_step import brents_method
 
 class orbit():
     def __init__(self, rFunc, tCutoff = 10e3):
         self.rFunc = rFunc
 
         #Evaluate the function until the times and get the radii and magnitude
-        self.times = np.arange(0, tCutoff)
+        self.times = np.arange(0, tCutoff, 1)
+        self.rFunc = rFunc
         self.r = rFunc(self.times)
-        self.rMag = self.r ** 2
-
         self.tCutoff = tCutoff
-        self.pericenter, self.tmin = self.pericenter(self.r, self.times, self.tCutoff)
+        self.pericenter, self.tmin = self.pericenter(self.times)
+        self.period = self.period(self.r, tCutoff= self.tCutoff)
 
-
-    def pericenter(r, times, tCutoff = 10e3): #time intervals of 1
+    #Find the pericenter of the orbit
+    def rSquared(self, times):
+        return self.rFunc(times) ** 2
+    def pericenter(self, times): #time intervals of 1
 
         #Use Golden Step minimization to find the minimum value of the magnitude
         a = times[0]
         b = times[times.size/2]
         c = times[-1]
         
-        tmin = golden_step(r ** 2, a, b, c)
-        pericenter = r[tmin]
+        tmin = brents_method(self.rSquared(times), a, b, c)
+        pericenter = self.rFunc(tmin)
         return pericenter, tmin
 
-    def period(r, pericenter, tCutoff = 10e3):
+    #Find the orbital period
+    def period(self, r, tCutoff = 10e3):
         rMag = r ** 2
-        minFunc = rMag - pericenter
-        roots = optimize.fsolve
+        roots = rfft(rMag, tCutoff)
+        return max(roots)
 
 
 

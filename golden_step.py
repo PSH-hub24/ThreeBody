@@ -1,11 +1,11 @@
 import numpy as np
 from scipy.optimize import brent
 
-def parabolic_step(func=None, a=None, b=None, c=None):
+def parabolic_step(func=None, offset = 0, a=None, b=None, c=None):
     """returns the minimum of the function as approximated by a parabola"""
-    fa = func(a)
-    fb = func(b)
-    fc = func(c)
+    fa = func(a) - offset
+    fb = func(b) - offset
+    fc = func(c) - offset
     denom = (b - a) * (fb - fc) - (b -c) * (fb - fa)
     numer = (b - a)**2 * (fb - fc) - (b -c)**2 * (fb - fa)
     # If singular, just return b 
@@ -32,17 +32,17 @@ def golden_step(func=None, astart=None, bstart=None, cstart=None, tol=1.e-5):
     return x
 
 
-def brents_method(f, left, right, tol=1e-10, max_iter=1000):
+def brents_method(f, left, right, offset = 0,  tol=1e-10, max_iter=1000):
     a = left
     c = right
     b = (left+right)/2
 
-    fb = f(b)
+    fb = f(b)-offset
     laststep = np.abs(b-a)
     for _ in range(max_iter):
         if(b>c or b<a):
             b = golden_step(f, a, b, c)
-        beff = parabolic_step(f, a, b, c)
+        beff = parabolic_step(f, a, b, c, offset=offset)
         if(laststep < np.abs(beff-b)):
             b = golden_step(f, a, b, c)
         else:
