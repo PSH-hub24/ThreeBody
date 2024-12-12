@@ -40,7 +40,7 @@ def test_two_body(a, e, tmax, tinterval, period_tolerance, plot = True):
         trajectory, = ax.plot([], [], 'r-', lw=1, label="Trajectory")
         
         # Plot the center of mass
-        plt.scatter([0], [0], label = "Center of mass", s=20)
+        plt.scatter([0], [0], label = "Central Mass", s=20)
         
         # Convert polar coordinates to Cartesian for the trajectory
         x, y = polarToCartesian(r.r, r.phi)
@@ -71,3 +71,12 @@ def test_two_body(a, e, tmax, tinterval, period_tolerance, plot = True):
 
     return r
 
+
+### Some test data commented below
+
+# a = 5
+# e = 0.90
+# tmax = 15*np.pi
+# tinterval = 0.01
+# period_tolerance = 0.5
+# test_two_body(a, e, tmax, tinterval, period_tolerance)
