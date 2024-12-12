@@ -13,6 +13,7 @@ from stable_orbit_test_config import stable_orbit_test
 from sun_earth_moon_config import sun_earth_moon
 from earth_moon_lagrange_config import earth_moon_lagrange
 from earth_moon_lagrange_rotating_config import earth_moon_lagrange_rotating
+from earth_moon_config import earth_moon_two_body
 
 # Reduced softening parameter for accuracy
 epsilon = np.float64(1e-10)
@@ -193,6 +194,7 @@ print("8. Random Cluster with Central Mass")
 print("9. Earth-Moon Lagrange Points")
 print("10. Earth-Moon Lagrange Points (Rotating Frame)")
 print("11. Stability Test")
+print("12. earth_moon_two_body")
 choice = int(input("Enter the number of your choice: "))
 if choice == 1:
     config = sun_earth_moon()
@@ -235,6 +237,8 @@ elif choice == 11:
         ax.grid()
 
     positions = symplectic_verlet(bodies, t_span, dt, axes_sim)
+elif choice == 12:
+    config = earth_moon_two_body()
 else:
     raise ValueError("Invalid choice. Exiting...")
  
