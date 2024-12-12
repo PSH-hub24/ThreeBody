@@ -4,85 +4,70 @@ from scipy.fft import rfft
 from golden_step import brents_method
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from prepWork import orbit
+from prepWork import orbit, two_body_problem
 
-class two_body_problem(orbit):
-    def __init__(self, a, e, tmax, tinterval, period_tolerance):
-        self.a = a
-        self.e = e
-        rFunc = self.radius
-        super().__init__(rFunc = rFunc,tmax = tmax,tinterval = tinterval,period_tolerance = period_tolerance)
-        # self.tmax = tmax
-        # self.tinterval = tinterval
-
-        # self.times = np.arange(0, tmax, tinterval)
-        # self.r = self.radius(self.times)
-        # self.pericenter = self.pericenter(self.r, self.times)
-        # self.period = self.period()
-    def t(self, phi):
-        return 2 * np.arctan(np.sqrt((1-self.e)/(1+self.e))*np.tan(phi/2))-(self.e * np.sqrt(1-self.e ** 2)*np.sin(phi))/(1+self.e*np.cos(phi))
-    def radius(self, time):
-        def offset_time(time, tolerance = 1e-8):
-            def offset(phi):
-                n = int((time+np.pi)/(2*np.pi))
-                t0 = time - 2*np.pi*(n)
-                return self.t(phi) - t0 - tolerance
-            return offset
-        self.times = time
-        phi = []
-        for t in self.times:
-            phi.append(brentq(offset_time(t), -np.pi, np.pi))
-        phi = np.array(phi)
-        self.phi = phi
-        r = (self.a * (1- self.e ** 2))/(1+self.e*np.cos(phi))
-        return r
-def test_two_body(a, e, tmax, tinterval, period_tolerance, save_path):
-    fig, ax = plt.subplots()
-    ax.set_xlim(-1.5, 1.5)
-    ax.set_ylim(-1.5, 1.5)
-
-    # Plot elements
-    point, = ax.plot([], [], 'bo', label="orbit")  # Animated point
-    trajectory, = ax.plot([], [], 'r-', lw=1, label="Trajectory")  # Path
+# Function to test the two-body problem simulation
+def test_two_body(a, e, tmax, tinterval, period_tolerance, plot = True):
+    # Function to convert polar coordinates to Cartesian coordinates
     def polarToCartesian(r, phi):
         x = r * np.cos(phi)
-        y = r* np.sin(phi)
+        y = r * np.sin(phi)
         return x, y
+
+    # Initialization function for the animation
     def init():
         point.set_data([], [])
         trajectory.set_data([], [])
         return point, trajectory
-
+    
+    # Solve the two-body problem with given parameters
     r = two_body_problem(a, e, tmax, tinterval, period_tolerance=period_tolerance)
-
+    
+    # Print the results of the simulation
     print("Radii:", r.r)
     print("angles:", r.phi)
     print("Pericenter:", r.pericenter)
     print("period:", r.period)
 
-    x, y = polarToCartesian(r.r, r.phi)
-    x = np.array(x)
-    y = np.array(y)
-    # Update function for animation
-    def update(frame):
-        point.set_data(x[frame:frame+1], y[frame:frame+1])  # Pass a sequence with one element at a time
-        trajectory.set_data(x[:frame], y[:frame])  # Update the trajectory
-        return point, trajectory
-    # Create the animation
-    plt.xlim(-10, 10)
-    plt.ylim(-10, 10)
-    ani = FuncAnimation(fig, update, frames=len(r.times), init_func=init, blit=True, interval=10)
-    ani.save(save_path + ".gif", writer='ffmpeg', fps=30)
-    # Show the animation
-    plt.legend()
-    plt.show()
+    # If plot is True, set up the animation
+    if(plot):
+        fig, ax = plt.subplots()
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_ylim(-1.5, 1.5)
+
+        # Plot elements: animated point and trajectory
+        point, = ax.plot([], [], 'bo', label="mass traveling along trajectory")
+        trajectory, = ax.plot([], [], 'r-', lw=1, label="Trajectory")
+        
+        # Plot the center of mass
+        plt.scatter([0], [0], label = "Center of mass", s=20)
+        
+        # Convert polar coordinates to Cartesian for the trajectory
+        x, y = polarToCartesian(r.r, r.phi)
+        x = np.array(x)
+        y = np.array(y)
+
+        # Update function for the animation
+        def update(frame):
+            point.set_data(x[frame:frame+1], y[frame:frame+1])  # Update the point position
+            trajectory.set_data(x[:frame], y[:frame])  # Update the trajectory
+            return point, trajectory
+        
+        # Set plot labels and properties
+        plt.xlabel("position in horizontal direction (scaled units)")
+        plt.ylabel("position in vertical direction (scaled units)")
+        tick_size = 10  # Specify the tick size
+        ax.tick_params(axis='both', which='major', labelsize=tick_size)
+        plt.xlim(-10, 10)
+        plt.ylim(-10, 10)
+        ax.set_aspect('equal')  # Ensure equal scaling on both axes
+
+        # Create the animation
+        ani = FuncAnimation(fig, update, frames=len(r.times), init_func=init, blit=True, interval=5)
+
+        # Show the animation with legend
+        plt.legend()
+        plt.show()
+
     return r
-    
 
-
-# a = 5
-# e = 0.99
-# tmax = 15*np.pi
-# tinterval = 0.01
-# period_tolerance = 0.5
-# test_two_body(a, e, tmax, tinterval, period_tolerance)
