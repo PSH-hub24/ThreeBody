@@ -89,110 +89,6 @@ def compute_angular_momentum(bodies):
         total_angular_momentum += np.cross(body.position, body.mass * body.velocity)
     return np.linalg.norm(total_angular_momentum)
 
-# def symplectic_verlet(bodies, t_span, dt, axes_sim):
-#     """
-#     Symplectic Verlet Integrator with real-time visualization and energy diagnostics.
-
-#     Parameters:
-#     bodies (list): List of Body objects.
-#     t_span (tuple): Time span for the simulation (start, end).
-#     dt (float): Time step for integration.
-#     axes_sim (list): Axes for real-time 2D projections (XY, YZ, XZ).
-
-#     Returns:
-#     list: Positions of all bodies over time (list of arrays).
-#     """
-#     t_start, t_end = t_span  # Unpack start and end times
-#     t = np.float64(t_start)  # Initialize current time
-#     dt = np.float64(dt)  # Convert time step to float64
-#     positions = [[] for _ in bodies]  # Store positions over time for all bodies
-
-#     step_count = 0  # Track the number of steps
-#     plt.ion()  # Enable interactive mode for real-time plotting
-
-#         # Initialize plot markers for real-time animation
-#     markers_xy = [axes_sim[0].plot([], [], 'o')[0] for _ in bodies]
-#     markers_yz = [axes_sim[1].plot([], [], 'o')[0] for _ in bodies]
-#     markers_xz = [axes_sim[2].plot([], [], 'o')[0] for _ in bodies]
-
-#     # Initial accelerations
-#     accelerations = compute_accelerations(bodies)
-
-#     # Initial energy for diagnostics
-#     initial_total_energy = compute_energy(bodies)
-#     print(f"Initial Energy ->  Total E: {initial_total_energy:.6f}")
-
-#     try:
-#         while t < t_end:
-#             # Increment time
-#             t += dt
-#             step_count += 1
-
-#             # Update position using current velocities and accelerations
-#             for i, body in enumerate(bodies):
-#                 body.position += body.velocity * dt + 0.5 * accelerations[i] * dt**2
-
-#             # Compute new accelerations based on updated positions
-#             new_accelerations = compute_accelerations(bodies)
-
-#             # Update velocities using the average of old and new accelerations
-#             for i, body in enumerate(bodies):
-#                 body.velocity += 0.5 * (accelerations[i] + new_accelerations[i]) * dt
-
-#             # Update accelerations for the next iteration
-#             accelerations = new_accelerations
-
-#             # Store positions for analysis
-#             for i, body in enumerate(bodies):
-#                 positions[i].append(body.position.copy())
-
-#             # Energy diagnostics every 50 steps
-#             if step_count % 50 == 0:
-#                 current_total_energy = compute_energy(bodies)
-#                 energy_drift = abs(current_total_energy - initial_total_energy) / abs(initial_total_energy)
-#                 angular_momentum = compute_angular_momentum(bodies)
-#                 print(
-#                     f"Time: {t:.3f}, "
-#                     f"Total E: {current_total_energy:.6f}, "
-#                     f"Energy Drift: {energy_drift:.6e}, "
-#                     f"Angular Momentum: {angular_momentum:.6f}"
-#                 )
-            
-#             # Update real-time plots every 10 steps
-#             # if  step_count % 10 == 0:
-#             #     for i, marker in enumerate(markers_xy):
-#             #         marker.set_data(positions[i][-1][0], positions[i][-1][1])  # XY projection
-#             #     for i, marker in enumerate(markers_yz):
-#             #         marker.set_data(positions[i][-1][1], positions[i][-1][2])  # YZ projection
-#             #     for i, marker in enumerate(markers_xz):
-#             #         marker.set_data(positions[i][-1][0], positions[i][-1][2])  # XZ projection
-
-#             #     # Update titles for all axes
-#             #     for ax, proj in zip(axes_sim, ['XY', 'YZ', 'XZ']):
-#             #         ax.set_title(f"Real-Time {proj} Projection | Time: {t:.3f}")
-#             #     plt.pause(0.0001)  # Pause to update the plots
-#             if step_count % 10 == 0:
-#                 for i, marker in enumerate(markers_xy):
-#                     marker.set_data([positions[i][-1][0]], [positions[i][-1][1]])  # XY projection
-#                 for i, marker in enumerate(markers_yz):
-#                     marker.set_data([positions[i][-1][1]], [positions[i][-1][2]])  # YZ projection
-#                 for i, marker in enumerate(markers_xz):
-#                     marker.set_data([positions[i][-1][0]], [positions[i][-1][2]])  # XZ projection
-
-#                 # Update titles for all axes
-#                 for ax, proj in zip(axes_sim, ['XY', 'YZ', 'XZ']):
-#                     ax.set_title(f"Real-Time {proj} Projection | Time: {t:.3f}")
-#                 plt.pause(0.0001)  # Pause to update the plots
-
-#     except KeyboardInterrupt:
-#         print("\nSimulation interrupted. Finalizing...")
-#     finally:
-#         print("Simulation stopped.")
-#         final_total_energy = compute_energy(bodies)
-#         print(f"Final Energy -> Total E: {final_total_energy:.6f}")
-
-#     return [np.array(p,np.float64) for p in positions]
-
 def symplectic_verlet(bodies, t_span, dt, axes_sim):
     """
     Symplectic Verlet Integrator with real-time visualization and energy diagnostics.
@@ -236,7 +132,6 @@ def symplectic_verlet(bodies, t_span, dt, axes_sim):
             # Increment time
             t += dt
             step_count += 1
-
             # Update position using current velocities and accelerations
             for i, body in enumerate(bodies):
                 body.position += body.velocity * dt + 0.5 * accelerations[i] * dt**2
