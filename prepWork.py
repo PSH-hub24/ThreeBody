@@ -4,7 +4,7 @@ from scipy.fft import rfft
 from golden_step import brents_method
 from matplotlib.animation import FuncAnimation
 from scipy.optimize import root, brentq
-
+from body import Body
 # Orbit class to represent and compute properties of a two-body problem
 class orbit():
     def __init__(self, rFunc, tmax, tinterval, period_tolerance = 0.5):

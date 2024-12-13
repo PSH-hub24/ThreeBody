@@ -54,8 +54,8 @@ def test_two_body(a, e, tmax, tinterval, period_tolerance, plot = True):
             return point, trajectory
         
         # Set plot labels and properties
-        plt.xlabel("position in horizontal direction (scaled units)")
-        plt.ylabel("position in vertical direction (scaled units)")
+        plt.xlabel("position in horizontal direction (unitless)")
+        plt.ylabel("position in vertical direction (unitless)")
         tick_size = 10  # Specify the tick size
         ax.tick_params(axis='both', which='major', labelsize=tick_size)
         plt.xlim(-10, 10)

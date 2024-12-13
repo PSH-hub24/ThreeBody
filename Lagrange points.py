@@ -52,8 +52,8 @@ lagrange_points = [fsolve(equations, guess) for guess in initial_guesses]
 plt.figure(figsize=(10, 8))
 plt.contourf(X, Y, Z, levels=50, cmap='viridis')
 plt.colorbar(label='Effective Potential')
-plt.xlabel('x (m)')
-plt.ylabel('y (m)')
+plt.xlabel('position in vertical direction (m)')
+plt.ylabel('position in horizontal direction (m)')
 plt.title('Effective Potential with Lagrange Points')
 plt.scatter([0, d], [0, 0], color='red', label='Massive Bodies')
 for point in lagrange_points:
