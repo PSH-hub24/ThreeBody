@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from matplotlib.animation import PillowWriter
 import time
 from broucke_orbit_config import broucke_orbit
 from equal_mass_orbit_config import equal_mass_orbit
@@ -88,6 +89,8 @@ def compute_angular_momentum(bodies):
     for body in bodies:
         total_angular_momentum += np.cross(body.position, body.mass * body.velocity)
     return np.linalg.norm(total_angular_momentum)
+ 
+
 
 def symplectic_verlet(bodies, t_span, dt, axes_sim):
     """
@@ -106,7 +109,7 @@ def symplectic_verlet(bodies, t_span, dt, axes_sim):
     t = np.float64(t_start)  # Initialize current time
     dt = np.float64(dt)  # Convert time step to float64
     positions = [[] for _ in bodies]  # Store positions over time for all bodies
-
+    global step_count
     step_count = 0  # Track the number of steps
     plt.ion()  # Enable interactive mode for real-time plotting
 
@@ -285,8 +288,8 @@ projections = ['XY', 'YZ', 'XZ']
 
 # Set up plot limits and titles for each projection
 for ax, proj in zip(axes_sim, projections):
-    ax.set_xlim(-50, 50)
-    ax.set_ylim(-50, 50)
+    ax.set_xlim(-4, 4)
+    ax.set_ylim(-4, 4)
     ax.set_title(f"Real-Time {proj} Projection")
     ax.set_xlabel(proj[0])
     ax.set_ylabel(proj[1])
@@ -305,8 +308,8 @@ positions = symplectic_verlet(config, t_span, dt, axes_sim)
 fig_proj, axes_proj = plt.subplots(1, 3, figsize=(18, 6))
 projections = ['XY', 'YZ', 'XZ']
 for ax, proj in zip(axes_proj, projections):
-    ax.set_xlim(-50, 50)
-    ax.set_ylim(-50, 50)
+    ax.set_xlim(-4, 4)
+    ax.set_ylim(-4, 4)
     ax.set_title(f'{proj} Projection')
     ax.set_xlabel(proj[0])
     ax.set_ylabel(proj[1])
@@ -324,15 +327,24 @@ def init():
 
 def update(frame):
     for i, marker in enumerate(markers_xy):
-        marker.set_data(positions[i][frame, 0], positions[i][frame, 1])
+        if frame >= len(positions[i]):
+            print(f"Frame {frame} exceeds available data for body {i}. Skipping...")
+            continue   
+        marker.set_data([positions[i][frame, 0]], [positions[i][frame, 1]])
     for i, marker in enumerate(markers_yz):
-        marker.set_data(positions[i][frame, 1], positions[i][frame, 2])
+        if frame >= len(positions[i]):
+            continue
+        marker.set_data([positions[i][frame, 1]], [positions[i][ frame, 2]])
     for i, marker in enumerate(markers_xz):
-        marker.set_data(positions[i][frame, 0], positions[i][frame, 2])
+        if frame >= len(positions[i]):
+            continue
+        marker.set_data([positions[i] [frame, 0]], [positions[i][frame, 2]])
     return markers_xy + markers_yz + markers_xz
 
-frames = min(len(positions[0]), 500)
-anim = FuncAnimation(fig_proj, update, frames=frames, init_func=init, blit=True)
+
+anim = FuncAnimation(fig_proj, update, frames=range(1,step_count,10), init_func=init, blit=True)
 
 plt.tight_layout()
+writer = PillowWriter(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+anim.save('L1.gif', writer=writer)
 plt.show()
